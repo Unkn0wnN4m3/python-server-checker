@@ -1,0 +1,4 @@
+-i https://pypi.org/simple
+
+colorama==0.4.5
+
