@@ -1,31 +1,42 @@
+import argparse
 import socket
 
 from colorama import Fore, Style, init
 
 
-def is_running(site: str) -> bool:
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((site, 80))
-        return True
-    except:
-        return False
+def main():
+    custom_timeout = 3
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+    parser = argparse.ArgumentParser(
+        prog="Server Checker",
+        description="A server status checker",
+    )
 
-if __name__ == "__main__":
+    parser.add_argument("hostname",
+                        help="Introduce a valid hostname [example.com]")
+
+    parser.add_argument("--port",
+                        "-p",
+                        type=int,
+                        default=80,
+                        help="Introduce a valid port [80]: --port <integer>")
+
+    args = parser.parse_args()
+
     init()
 
-    while True:
-        site = input("Website to connect: ")
+    try:
+        sock.settimeout(custom_timeout)
+        sock.connect((args.hostname, args.port))
+    except Exception:
+        print(Fore.RED + '\nCheck if hostname or port are correct')
+    else:
+        print(Fore.GREEN + f'\n> {args.hostname} is running!')
+        sock.close()
 
-        if is_running(site):
-            print(Fore.GREEN + f"\n{site} is running!")
-        else:
-            print(Fore.RED + f"\nThere is a problem with {site}")
+    Style.RESET_ALL
 
-        print(Style.RESET_ALL)
 
-        if input("Would you like to check another website? [Y/n]: ") in {
-                "n", "N"
-        }:
-            break
+if __name__ == '__main__':
+    main()
